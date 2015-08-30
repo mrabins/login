@@ -8,7 +8,10 @@
 
 import UIKit
 
-class LoginViewController: UIViewController {
+class LoginViewController: UIViewController, CreateAccountViewControllerDelegate {
+    
+    @IBOutlet weak var usernameTextField: UITextField!
+    @IBOutlet weak var passwordTextField: UITextField!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,15 +24,46 @@ class LoginViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "loginToCreateAccountSegue" {
+            var createAccountVC = segue.destinationViewController as CreateAccountViewController
+            createAccountVC.delegate = self
+        }
     }
-    */
+    
+    
+    @IBAction func loginButtonPressed(send: UIButton) {
+        
+        let usernameSavedFromNSUserDefaults = NSUserDefaults.standardUserDefaults().objectForKey(kUserNameKey) as String
+        println(usernameSavedFromNSUserDefaults)
+        let passwordSavedFromNSUserDefaults = NSUserDefaults.standardUserDefaults().objectForKey(kPasswordKey) as String
+        println(passwordSavedFromNSUserDefaults)
+        
+        if usernameTextField.text != usernameSavedFromNSUserDefaults || passwordTextField.text != passwordSavedFromNSUserDefaults {
+            var alertController = UIAlertController(title: "Error", message: "Username and Password do not match our records, please try again", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)
+            
+        } else {
+            self.performSegueWithIdentifier("loginToMainSegue", sender: self)
+
+        }
+        
+
+        
+      
+        
+    }
+    @IBAction func createAccountButtonPressed(send: UIButton) {
+        self.performSegueWithIdentifier("loginToCreateAccountSegue", sender: self)
+        
+    }
+    
+    // CreateAccountViewControllerDelegate
+    
+    func accountCreated() {
+        self.performSegueWithIdentifier("loginToMainSegue", sender: nil)
+    }
+    
 
 }

@@ -8,8 +8,18 @@
 
 import UIKit
 
-class CreateAccountViewController: UIViewController {
+protocol CreateAccountViewControllerDelegate {
+    func accountCreated ()
+}
 
+class CreateAccountViewController: UIViewController {
+    
+    @IBOutlet weak var chooseUsernameTextField:  UITextField!
+    @IBOutlet weak var choosePasswordTextField:  UITextField!
+    @IBOutlet weak var confirmPasswordTextField: UITextField!
+    
+    var delegate:CreateAccountViewControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -21,15 +31,33 @@ class CreateAccountViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    @IBAction func createAccountButtonPressed (sender: UIButton) {
+        
+        println("\(choosePasswordTextField.text.isEmpty)")
+        
+        if choosePasswordTextField.text == confirmPasswordTextField.text && choosePasswordTextField.text != nil {
+            
+            NSUserDefaults.standardUserDefaults().setObject(self.chooseUsernameTextField.text, forKey: kUserNameKey)
+            NSUserDefaults.standardUserDefaults().setObject(self.choosePasswordTextField.text, forKey: kPasswordKey)
+            NSUserDefaults.standardUserDefaults().synchronize()
+            
+            self.dismissViewControllerAnimated(true, completion: nil)
+            delegate?.accountCreated()
+            
+        }
+        else {
+            var alertController = UIAlertController(title: "Error", message: "There was an error creating your account, please try again", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)
+            
+        }
+        
     }
-    */
+    
+    @IBAction func cancelAccountButtonPressed (sender: UIButton) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+        
+    }
+
 
 }
